@@ -132,8 +132,8 @@ fetch 이벤트가 발생했을 떄 동작하는 함수를 만들어보자
 ```js
 // servierworker.js
 
-addEventListener("fetch", () => {
-  console.log("서비스 워커가 fetch 이벤트를 감시합니다.");
+addEventListener("fetch", (fetchEvent) => {
+  console.log("서비스 워커가 fetch 이벤트를 감시합니다.", fetchEvent);
 });
 ```
 
@@ -147,8 +147,62 @@ addEventListener("fetch", () => {
 서비스워커가 2개 인 것을 확인 할 수 있다. 서비스 워커 스크립트를 수정했을 때 브라우저는 기존 서비스 워커가 현재 브라우저에 로드되어 있는 페이지를
 계속 제어하고 있기 떄문에 이전 버전의 서비스 워커를 새 버전의 서비스 워커로 교체 할 수 없다.
 
+## 생명주기
+
+```js
+navigator.serviceWorker.register("/serviceworker.js");
+```
+
+1. 위의 코드에 의해 서비스 워커가 등록된다.
+2. 등록된 서비스 워커가 다운로드된다.
+3. 다운로드된 서비스 워커 파일은 브라우저에 설치된다.
+4. 서비스 워커가 활성화되며 브라우저 제어권을 얻는다.
+5. 활성화된 후에는 서비스워커가 사이트에 대한 모든 요청을 중계한다.
+
+서비스 워커를 수정하는 경우, 사용자의 브라우저에 설치된 기존 서비스 워커를 수정하는것이 아니라, 완전히 새로운 버전의
+서비스 워커를 추가로 제공하는 것이 된다.
+
+서비스 워커가 업데이트되는 방식은 브라우저 자체가 업데이트되는 방식과 비슷하다.
+크롬은 새 버전이 나오면 백그라운드에 다운로드해놓는다.
+사용자가 브라우저를 종료한 경우에 기존 버전을 삭제하고 새 버전을 설치한다.
+
+서비스워커도 마찬가지로 사용자가 브라우저를 재시작할 떄까지 대기해야한다.
+
+## 갱신하기
+
+브라우저에서 기존 서비스 워커가 제어하는 도메인의 탭이나 창이 열려 있는 동안에는 새 버전의 서비스 워커는 활성화 대기 중일 수 밖에 없다.
+
+수정한 서비스 워커를 확실하게 적용시키는 방법은 두 가지다.
+
+1. 설치된 도메인과 관련된 모든 창과 탭을 닫는다.
+2. application 탭에서 skipWating 명령을 사용한다.
+
+## fetch 이벤트를 이용하여 response 변조하기
+
+```js
+addEventListener("fetch", (fetchEvent) => {
+  console.log("서비스 워커가 fetch 이벤트를 감시합니다.", fetchEvent);
+});
+```
+
+![fetch event log](/images/fetch-event-log.png)
+
+fetch event 객체를 살펴보면 method, mode, referrer, credentials, url 등 다양한 속성을 확인 할 수 있다.
+
+fetch 이벤트를 감시하는 것 뿐만아니라 fetch event 객체 내부의 `respondWith` 메서드를 사용하여 response 내용을 변조 할 수 있다.
+
+```js
+addEventListener("fetch", (fetchEvent) => {
+  console.log("서비스 워커가 fetch 이벤트를 감시합니다.", fetchEvent);
+
+  fetchEvent.respondWith(new Response("변조된 Response"));
+});
+```
+
+![변조된 Response](/images/respond-with.png)
+
 ## 출처
 
-재래미 키스의 - 서비스 워커로 만드는 오프라인 웹사이트 (Going Offline) 를 보고 작성한 예제와 설명 글입니다.
+재래미 키스의 - [서비스 워커로 만드는 오프라인 웹사이트 (Going Offline)](https://book.naver.com/bookdb/book_detail.nhn?bid=16375914) 를 보고 작성한 예제와 설명 글입니다.
 
 ![출처](/images/source.png)
