@@ -1,0 +1,15 @@
+{
+  "name": "javascript-service-worker",
+  "version": "1.0.0",
+  "description": "service-worker",
+  "main": "serviceworker.js",
+  "scripts": {
+    "start": "http-server -o"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^0.12.3"
+  }
+}

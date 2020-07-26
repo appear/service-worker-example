@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="serviceworker" href="/serviceworker.js" />
+  </head>
+  <body>
+    <script>
+      if (navigator.serviceWorker) {
+        navigator.serviceWorker
+          .register("/serviceworker.js")
+          .then((registration) => {
+            console.log("등록 성공", registration);
+          })
+          .catch((error) => {
+            console.log("등록 실패", error);
+          });
+      }
+    </script>
+  </body>
+</html>
