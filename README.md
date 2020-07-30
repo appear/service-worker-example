@@ -201,6 +201,43 @@ addEventListener("fetch", (fetchEvent) => {
 
 ![변조된 Response](/images/respond-with.png)
 
+## Fetch API
+
+fetch API 와 fetch event 객체의 request 를 이용하면 원래 브라우저가 하려던 일을 할 수 있다.
+아래의 코드는 오프라인시 브라우저 기본 에러문구에 의존하지 않는다.
+
+```js
+addEventListener("fetch", (fetchEvent) => {
+  console.log("서비스 워커가 fetch 이벤트를 감시합니다.", fetchEvent);
+
+  const request = fetchEvent.request;
+
+  fetchEvent.respondWith(
+    fetch(request)
+      .then((responseFormFetch) => {
+        return responseFormFetch;
+      })
+      .catch((error) => {
+        return new Response("<h1> Error </h1> <p> 뭔가 잘못되었습니다! </p>", {
+          headers: {
+            "Content-type": "text/html;charset=utf-8",
+          },
+        });
+      })
+  );
+});
+```
+
+## HTTP 캐시
+
+브라우저에서 서버에서 한번 가져왔던 이미지를 가져오려하면 서버로 요청하지 않고 자신이 이미지 사본을 받아둔 것을 인식하고 재사용한다. 메모리캐시는 서버에 중복된 요청을 보내지 않아도 되기 때문에 유용하지만 단기간 상호작용에서만 가능한다. 사용자가 페이지를 나가버리면 브라우저는 메모리 캐시에 올려둔 것을 모두 잊어버린다.
+
+브라우저에는 지속 기간이 더 긴 `HTTP 캐시` 라는 저장 공간도 있다. HTTP 캐시에 저장해두면 몇 개월, 몇 년 동안 재사용하는 것이 가능하다. 하지만 자주 수정되는 파일을 캐시한다면 사이트에 방문하는 사라믇ㄹ은 낡은 버전의 홈페이지를 계속 보게 될 수 있다. 수정이 적은 파일을 캐시하면 유용하게 이용 할 수 있다.
+
+HTTP 캐시가 엉뚱한 파일을 저장하지 않도록 명시적으로 지시된 파일만 캐시한다. 캐시할 파일과 저장기간은 웹 서버에서 설정한다. 이 설정은 max-age와 같은 HTTP 헤더를 주고 받으면서 이루어진다.
+
+## Cache API
+
 ## 출처
 
 재래미 키스의 - [서비스 워커로 만드는 오프라인 웹사이트 (Going Offline)](https://book.naver.com/bookdb/book_detail.nhn?bid=16375914) 를 보고 작성한 예제와 설명 글입니다.
